@@ -83,9 +83,7 @@ export class WishlistsService {
     const wishlist = await this.findById(id);
 
     if (wishlist.owner.id !== userId) {
-      throw new ForbiddenException(
-        'Вы не можете удалить чужой список желаний',
-      );
+      throw new ForbiddenException('Вы не можете удалить чужой список желаний');
     }
 
     await this.wishlistsRepository.remove(wishlist);

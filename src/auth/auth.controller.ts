@@ -3,13 +3,14 @@ import {
   Post,
   Body,
   UseGuards,
-  Request,
   UseInterceptors,
   ClassSerializerInterceptor,
 } from '@nestjs/common';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from '../users/dto/create-user.dto';
+import { AuthUser } from '../common/decorators/auth-user.decorator';
+import type { User } from '../users/entities/user.entity';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller()
@@ -23,7 +24,7 @@ export class AuthController {
 
   @UseGuards(AuthGuard('local'))
   @Post('signin')
-  async signin(@Request() req) {
-    return this.authService.login(req.user);
+  signin(@AuthUser() user: User) {
+    return this.authService.login(user);
   }
 }

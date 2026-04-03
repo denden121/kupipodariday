@@ -47,10 +47,7 @@ export class OffersService {
     const allOffers = await this.offersRepository.find({
       where: { item: { id: wish.id } },
     });
-    const totalRaised = allOffers.reduce(
-      (sum, o) => sum + Number(o.amount),
-      0,
-    );
+    const totalRaised = allOffers.reduce((sum, o) => sum + Number(o.amount), 0);
     await this.wishesService.updateRaised(wish.id, totalRaised);
 
     return savedOffer;

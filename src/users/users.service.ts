@@ -75,7 +75,9 @@ export class UsersService {
         where: { username: updateUserDto.username },
       });
       if (existing) {
-        throw new ConflictException('Пользователь с таким username уже существует');
+        throw new ConflictException(
+          'Пользователь с таким username уже существует',
+        );
       }
     }
 
@@ -84,7 +86,9 @@ export class UsersService {
         where: { email: updateUserDto.email },
       });
       if (existing) {
-        throw new ConflictException('Пользователь с таким email уже существует');
+        throw new ConflictException(
+          'Пользователь с таким email уже существует',
+        );
       }
     }
 

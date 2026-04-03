@@ -8,7 +8,6 @@ import {
   Param,
   ParseIntPipe,
   UseGuards,
-  Request,
   UseInterceptors,
   ClassSerializerInterceptor,
 } from '@nestjs/common';
@@ -17,6 +16,8 @@ import { CreateWishDto } from './dto/create-wish.dto';
 import { UpdateWishDto } from './dto/update-wish.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UsersService } from '../users/users.service';
+import { AuthUser } from '../common/decorators/auth-user.decorator';
+import type { JwtPayload } from '../common/decorators/auth-user.decorator';
 
 @UseInterceptors(ClassSerializerInterceptor)
 @Controller('wishes')
@@ -38,8 +39,11 @@ export class WishesController {
 
   @UseGuards(JwtAuthGuard)
   @Post()
-  async create(@Body() createWishDto: CreateWishDto, @Request() req) {
-    const user = await this.usersService.findById(req.user.userId);
+  async create(
+    @Body() createWishDto: CreateWishDto,
+    @AuthUser() authUser: JwtPayload,
+  ) {
+    const user = await this.usersService.findById(authUser.userId);
     return this.wishesService.create(createWishDto, user);
   }
 
@@ -54,21 +58,27 @@ export class WishesController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateWishDto: UpdateWishDto,
-    @Request() req,
+    @AuthUser() authUser: JwtPayload,
   ) {
-    return this.wishesService.updateById(id, updateWishDto, req.user.userId);
+    return this.wishesService.updateById(id, updateWishDto, authUser.userId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
-    return this.wishesService.deleteById(id, req.user.userId);
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @AuthUser() authUser: JwtPayload,
+  ) {
+    return this.wishesService.deleteById(id, authUser.userId);
   }
 
   @UseGuards(JwtAuthGuard)
   @Post(':id/copy')
-  async copy(@Param('id', ParseIntPipe) id: number, @Request() req) {
-    const user = await this.usersService.findById(req.user.userId);
+  async copy(
+    @Param('id', ParseIntPipe) id: number,
+    @AuthUser() authUser: JwtPayload,
+  ) {
+    const user = await this.usersService.findById(authUser.userId);
     return this.wishesService.copyWish(id, user);
   }
 }

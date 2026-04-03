@@ -59,7 +59,11 @@ export class WishesService {
       throw new ForbiddenException('Вы не можете редактировать чужое желание');
     }
 
-    if (updateWishDto.price !== undefined && wish.offers && wish.offers.length > 0) {
+    if (
+      updateWishDto.price !== undefined &&
+      wish.offers &&
+      wish.offers.length > 0
+    ) {
       throw new BadRequestException(
         'Нельзя изменить стоимость желания, на которое уже есть заявки',
       );

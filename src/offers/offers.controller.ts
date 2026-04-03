@@ -6,7 +6,6 @@ import {
   Param,
   ParseIntPipe,
   UseGuards,
-  Request,
   UseInterceptors,
   ClassSerializerInterceptor,
 } from '@nestjs/common';
@@ -14,6 +13,8 @@ import { OffersService } from './offers.service';
 import { CreateOfferDto } from './dto/create-offer.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UsersService } from '../users/users.service';
+import { AuthUser } from '../common/decorators/auth-user.decorator';
+import type { JwtPayload } from '../common/decorators/auth-user.decorator';
 
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(ClassSerializerInterceptor)
@@ -30,8 +31,11 @@ export class OffersController {
   }
 
   @Post()
-  async create(@Body() createOfferDto: CreateOfferDto, @Request() req) {
-    const user = await this.usersService.findById(req.user.userId);
+  async create(
+    @Body() createOfferDto: CreateOfferDto,
+    @AuthUser() authUser: JwtPayload,
+  ) {
+    const user = await this.usersService.findById(authUser.userId);
     return this.offersService.create(createOfferDto, user);
   }
 

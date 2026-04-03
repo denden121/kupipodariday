@@ -8,7 +8,6 @@ import {
   Param,
   ParseIntPipe,
   UseGuards,
-  Request,
   UseInterceptors,
   ClassSerializerInterceptor,
 } from '@nestjs/common';
@@ -17,6 +16,8 @@ import { CreateWishlistDto } from './dto/create-wishlist.dto';
 import { UpdateWishlistDto } from './dto/update-wishlist.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 import { UsersService } from '../users/users.service';
+import { AuthUser } from '../common/decorators/auth-user.decorator';
+import type { JwtPayload } from '../common/decorators/auth-user.decorator';
 
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(ClassSerializerInterceptor)
@@ -33,8 +34,11 @@ export class WishlistsController {
   }
 
   @Post()
-  async create(@Body() createWishlistDto: CreateWishlistDto, @Request() req) {
-    const user = await this.usersService.findById(req.user.userId);
+  async create(
+    @Body() createWishlistDto: CreateWishlistDto,
+    @AuthUser() authUser: JwtPayload,
+  ) {
+    const user = await this.usersService.findById(authUser.userId);
     return this.wishlistsService.create(createWishlistDto, user);
   }
 
@@ -47,13 +51,20 @@ export class WishlistsController {
   update(
     @Param('id', ParseIntPipe) id: number,
     @Body() updateWishlistDto: UpdateWishlistDto,
-    @Request() req,
+    @AuthUser() authUser: JwtPayload,
   ) {
-    return this.wishlistsService.updateById(id, updateWishlistDto, req.user.userId);
+    return this.wishlistsService.updateById(
+      id,
+      updateWishlistDto,
+      authUser.userId,
+    );
   }
 
   @Delete(':id')
-  remove(@Param('id', ParseIntPipe) id: number, @Request() req) {
-    return this.wishlistsService.deleteById(id, req.user.userId);
+  remove(
+    @Param('id', ParseIntPipe) id: number,
+    @AuthUser() authUser: JwtPayload,
+  ) {
+    return this.wishlistsService.deleteById(id, authUser.userId);
   }
 }

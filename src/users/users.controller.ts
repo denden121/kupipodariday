@@ -6,13 +6,15 @@ import {
   Body,
   Param,
   UseGuards,
-  Request,
   UseInterceptors,
   ClassSerializerInterceptor,
+  SerializeOptions,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { JwtAuthGuard } from '../auth/jwt-auth.guard';
+import { AuthUser } from '../common/decorators/auth-user.decorator';
+import type { JwtPayload } from '../common/decorators/auth-user.decorator';
 
 @UseGuards(JwtAuthGuard)
 @UseInterceptors(ClassSerializerInterceptor)
@@ -20,19 +22,21 @@ import { JwtAuthGuard } from '../auth/jwt-auth.guard';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @SerializeOptions({ groups: ['me'] })
   @Get('me')
-  getMe(@Request() req) {
-    return this.usersService.findById(req.user.userId);
+  getMe(@AuthUser() user: JwtPayload) {
+    return this.usersService.findById(user.userId);
   }
 
+  @SerializeOptions({ groups: ['me'] })
   @Patch('me')
-  updateMe(@Request() req, @Body() updateUserDto: UpdateUserDto) {
-    return this.usersService.updateById(req.user.userId, updateUserDto);
+  updateMe(@AuthUser() user: JwtPayload, @Body() updateUserDto: UpdateUserDto) {
+    return this.usersService.updateById(user.userId, updateUserDto);
   }
 
   @Get('me/wishes')
-  getMyWishes(@Request() req) {
-    return this.usersService.getUserWishes(req.user.userId);
+  getMyWishes(@AuthUser() user: JwtPayload) {
+    return this.usersService.getUserWishes(user.userId);
   }
 
   @Get(':username')

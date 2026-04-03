@@ -19,7 +19,10 @@ export class AuthService {
       return null;
     }
 
-    const isPasswordValid = await this.hashService.verify(password, user.password);
+    const isPasswordValid = await this.hashService.verify(
+      password,
+      user.password,
+    );
     if (!isPasswordValid) {
       return null;
     }
@@ -27,7 +30,7 @@ export class AuthService {
     return user;
   }
 
-  async login(user: User): Promise<{ access_token: string }> {
+  login(user: User): { access_token: string } {
     const payload = { sub: user.id, username: user.username };
     return {
       access_token: this.jwtService.sign(payload),
