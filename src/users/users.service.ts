@@ -108,7 +108,12 @@ export class UsersService {
   async getUserWishes(userId: number) {
     const user = await this.usersRepository.findOne({
       where: { id: userId },
-      relations: ['wishes', 'wishes.owner', 'wishes.offers'],
+      relations: [
+        'wishes',
+        'wishes.owner',
+        'wishes.offers',
+        'wishes.offers.user',
+      ],
     });
     if (!user) {
       throw new NotFoundException('Пользователь не найден');
@@ -119,7 +124,12 @@ export class UsersService {
   async getUserWishesByUsername(username: string) {
     const user = await this.usersRepository.findOne({
       where: { username },
-      relations: ['wishes', 'wishes.owner', 'wishes.offers'],
+      relations: [
+        'wishes',
+        'wishes.owner',
+        'wishes.offers',
+        'wishes.offers.user',
+      ],
     });
     if (!user) {
       throw new NotFoundException('Пользователь не найден');

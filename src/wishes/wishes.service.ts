@@ -28,6 +28,7 @@ export class WishesService {
 
   async findLast(): Promise<Wish[]> {
     return this.wishesRepository.find({
+      relations: ['owner'],
       order: { createdAt: 'DESC' },
       take: 40,
     });
@@ -35,13 +36,17 @@ export class WishesService {
 
   async findTop(): Promise<Wish[]> {
     return this.wishesRepository.find({
+      relations: ['owner'],
       order: { copied: 'DESC' },
       take: 20,
     });
   }
 
   async findById(id: number): Promise<Wish> {
-    const wish = await this.wishesRepository.findOne({ where: { id } });
+    const wish = await this.wishesRepository.findOne({
+      where: { id },
+      relations: ['owner', 'offers', 'offers.user'],
+    });
     if (!wish) {
       throw new NotFoundException('Желание не найдено');
     }
@@ -59,11 +64,7 @@ export class WishesService {
       throw new ForbiddenException('Вы не можете редактировать чужое желание');
     }
 
-    if (
-      updateWishDto.price !== undefined &&
-      wish.offers &&
-      wish.offers.length > 0
-    ) {
+    if (updateWishDto.price !== undefined && wish.offers.length > 0) {
       throw new BadRequestException(
         'Нельзя изменить стоимость желания, на которое уже есть заявки',
       );

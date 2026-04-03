@@ -42,7 +42,7 @@ export class Wish {
   @Column({ length: 1024 })
   description: string;
 
-  @OneToMany(() => Offer, (offer) => offer.item, { eager: true })
+  @OneToMany(() => Offer, (offer) => offer.item)
   offers: Offer[];
 
   @Column({ default: 0 })

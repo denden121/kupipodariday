@@ -43,7 +43,6 @@ export class OffersService {
 
     const savedOffer = await this.offersRepository.save(offer);
 
-    // Recalculate raised amount from all offers for this wish
     const allOffers = await this.offersRepository.find({
       where: { item: { id: wish.id } },
     });
@@ -54,11 +53,16 @@ export class OffersService {
   }
 
   async findAll(): Promise<Offer[]> {
-    return this.offersRepository.find();
+    return this.offersRepository.find({
+      relations: ['user', 'item'],
+    });
   }
 
   async findById(id: number): Promise<Offer> {
-    const offer = await this.offersRepository.findOne({ where: { id } });
+    const offer = await this.offersRepository.findOne({
+      where: { id },
+      relations: ['user', 'item'],
+    });
     if (!offer) {
       throw new NotFoundException('Заявка не найдена');
     }
