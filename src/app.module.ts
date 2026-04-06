@@ -15,11 +15,11 @@ import { Offer } from './offers/entities/offer.entity';
   imports: [
     TypeOrmModule.forRoot({
       type: 'postgres',
-      host: process.env.DATABASE_HOST || 'localhost',
-      port: parseInt(process.env.DATABASE_PORT || '5432', 10),
-      username: process.env.DATABASE_USERNAME || 'student',
-      password: process.env.DATABASE_PASSWORD || 'student',
-      database: process.env.DATABASE_NAME || 'kupipodariday',
+      host: process.env.POSTGRES_HOST || 'localhost',
+      port: parseInt(process.env.POSTGRES_PORT || '5432', 10),
+      username: process.env.POSTGRES_USER || 'student',
+      password: process.env.POSTGRES_PASSWORD || 'student',
+      database: process.env.POSTGRES_DB || 'kupipodariday',
       entities: [User, Wish, Wishlist, Offer],
       synchronize: true,
     }),

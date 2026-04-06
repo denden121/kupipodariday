@@ -1,0 +1,55 @@
+version: '3.8'
+
+services:
+  database:
+    image: postgres:16-alpine
+    container_name: kupipodariday-db
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGDATA: ${PGDATA}
+    volumes:
+      - postgres_data:${PGDATA}
+    networks:
+      - kupipodariday-network
+    restart: unless-stopped
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: kupipodariday-backend
+    env_file:
+      - .env
+    ports:
+      - "4000:4000"
+    depends_on:
+      - database
+    networks:
+      - kupipodariday-network
+    restart: unless-stopped
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        REACT_APP_API_URL: ${REACT_APP_API_URL:-http://localhost:4000}
+    container_name: kupipodariday-frontend
+    ports:
+      - "8081:80"
+    depends_on:
+      - backend
+    networks:
+      - kupipodariday-network
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
+networks:
+  kupipodariday-network:
+    driver: bridge
